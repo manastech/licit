@@ -40,6 +40,10 @@ along with FooBar.  If not, see <http://www.gnu.org/licenses/>.
 END
     end
 
+    it "caches header" do
+      subject.header.should be(subject.header)
+    end
+
     context "dir1" do
       let(:licenser) { Licit::Licenser.new dir: File.expand_path('../dir1', __FILE__) }
       after(:each) { FileUtils.rm_f Dir.glob(File.join(File.expand_path('../dir1', __FILE__), '*')) }

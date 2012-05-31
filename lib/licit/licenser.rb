@@ -112,8 +112,10 @@ class Licit::Licenser
   end
 
   def header
-    template = ERB.new File.read(File.join(license_dir, 'header.erb'))
-    template.result binding
+    @header ||= begin
+      template = ERB.new File.read(File.join(license_dir, 'header.erb'))
+      template.result binding
+    end
   end
 
   def copyright
