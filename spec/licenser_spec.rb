@@ -54,6 +54,25 @@ END
       end
     end
 
+    context "dir2" do
+      let(:licenser) { Licit::Licenser.new dir: File.expand_path('../dir2.tmp', __FILE__), copyright: 'Copyright Line', program_name: 'FooBar' }
+      before(:each) { FileUtils.cp_r File.expand_path('../dir2', __FILE__), File.expand_path('../dir2.tmp', __FILE__)}
+      after(:each) { FileUtils.rm_rf File.expand_path('../dir2.tmp', __FILE__) }
+
+      it "check headers" do
+        licenser.check_headers.should =~ [[:error, 'test.rb', 'Missing header in test.rb'], [:error, 'subdir/test1.rb', 'Missing header in subdir/test1.rb']]
+      end
+
+      it "fixes headers" do
+        file = File.expand_path '../dir2.tmp/subdir/test1.rb', __FILE__
+        last_line_before = File.readlines(file).last
+        licenser.fix_headers
+        licenser.check_file_header(file).should be_true
+        last_line_after = File.readlines(file).last
+        last_line_after.should == last_line_before
+      end
+    end
+
   end
 
 end

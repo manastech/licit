@@ -34,6 +34,51 @@ class Licit::Licenser
     end
   end
 
+  def check_headers
+    result = []
+    Dir.chdir(dir) do
+      Dir['**/*.rb'].each do |source_file|
+        if not check_file_header(source_file)
+          result << [:error, source_file, "Missing header in #{source_file}"]
+        end
+      end
+    end
+    result
+  end
+
+  def fix_headers
+    Dir.chdir(dir) do
+      Dir['**/*.rb'].each do |source_file|
+        if not check_file_header(source_file)
+          source = File.read source_file
+          File.open source_file, 'w' do |f|
+            header.each_line do |header_line|
+              f.write "# #{header_line}"
+            end
+            f.write "\n"
+            f.write source
+          end
+        end
+      end
+    end
+  end
+
+  def check_file_header(file)
+    File.open(file, 'r') do |f|
+      begin
+        header.each_line do |header_line|
+          file_line = f.readline
+          return false unless file_line.start_with? '#'
+          file_line = file_line[1..-1].strip
+          return false if file_line != header_line.chomp
+        end
+      rescue EOFError
+        return false
+      end
+    end
+    true
+  end
+
   def files
     Dir.chdir(files_dir) do
       return Dir['**']
