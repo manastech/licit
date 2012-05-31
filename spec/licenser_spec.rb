@@ -16,9 +16,33 @@ describe Licit::Licenser do
       subject.files.should == ['LICENSE']
     end
 
+    it "composes header" do
+      licenser = Licit::Licenser.new copyright: 'Copyright Line', program_name: 'FooBar'
+      licenser.copyright.should == 'Copyright Line'
+      licenser.program_name.should == 'FooBar'
+      licenser.header.should == <<-END
+Copyright Line
+
+This file is part of FooBar.
+
+FooBar is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+FooBar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with FooBar.  If not, see <http://www.gnu.org/licenses/>.
+END
+    end
+
     context "dir1" do
-      let(:licenser) { Licit::Licenser.new(File.expand_path '../dir1', __FILE__) }
-      after(:each) { FileUtils.rm_f Dir.glob(File.join(licenser.dir, '*')) }
+      let(:licenser) { Licit::Licenser.new dir: File.expand_path('../dir1', __FILE__) }
+      after(:each) { FileUtils.rm_f Dir.glob(File.join(File.expand_path('../dir1', __FILE__), '*')) }
 
       it "checks missing files" do
         licenser.check_files.should == [[:error, 'LICENSE', 'Missing file LICENSE']]
