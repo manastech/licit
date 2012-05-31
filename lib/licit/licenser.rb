@@ -3,7 +3,7 @@ require 'erb'
 class Licit::Licenser
 
   def initialize(options = {})
-    defaults = { dir: '.', license: 'GPLv3' }
+    defaults = { dir: '.', license: 'GPLv3', exclude: [] }
     @options = defaults.merge options
   end
 
@@ -38,29 +38,34 @@ class Licit::Licenser
 
   def check_headers
     result = []
-    Dir.chdir(dir) do
-      Dir['**/*.rb'].each do |source_file|
-        if not check_file_header(source_file)
-          result << [:error, source_file, "Missing header in #{source_file}"]
-        end
+    each_source_file do |source_file|
+      if not check_file_header(source_file)
+        result << [:error, source_file, "Missing header in #{source_file}"]
       end
     end
     result
   end
 
   def fix_headers
+    each_source_file do |source_file|
+      if not check_file_header(source_file)
+        source = File.read source_file
+        File.open source_file, 'w' do |f|
+          header.each_line do |header_line|
+            f.write "# #{header_line}"
+          end
+          f.write "\n"
+          f.write source
+        end
+      end
+    end
+  end
+
+  def each_source_file
     Dir.chdir(dir) do
       Dir['**/*.rb'].each do |source_file|
-        if not check_file_header(source_file)
-          source = File.read source_file
-          File.open source_file, 'w' do |f|
-            header.each_line do |header_line|
-              f.write "# #{header_line}"
-            end
-            f.write "\n"
-            f.write source
-          end
-        end
+        next if should_exclude source_file
+        yield source_file
       end
     end
   end
@@ -97,6 +102,13 @@ class Licit::Licenser
 
   def path_for(file)
     File.join files_dir, file
+  end
+
+  def should_exclude(file)
+    @options[:exclude].each do |excluded|
+      return true if file.start_with? excluded
+    end
+    false
   end
 
   def header

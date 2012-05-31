@@ -63,6 +63,11 @@ END
         licenser.check_headers.should =~ [[:error, 'test.rb', 'Missing header in test.rb'], [:error, 'subdir/test1.rb', 'Missing header in subdir/test1.rb']]
       end
 
+      it "check headers excluding directory" do
+        licenser = Licit::Licenser.new dir: File.expand_path('../dir2.tmp', __FILE__), copyright: 'Copyright Line', program_name: 'FooBar', exclude: ['subdir/']
+        licenser.check_headers.should =~ [[:error, 'test.rb', 'Missing header in test.rb']]
+      end
+
       it "fixes headers" do
         file = File.expand_path '../dir2.tmp/subdir/test1.rb', __FILE__
         last_line_before = File.readlines(file).last
