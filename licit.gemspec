@@ -14,4 +14,5 @@ Gem::Specification.new do |gem|
   gem.name          = "licit"
   gem.require_paths = ["lib"]
   gem.version       = Licit::VERSION
+  gem.add_development_dependency 'rspec'
 end
