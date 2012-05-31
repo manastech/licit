@@ -1,3 +1,5 @@
+require 'erb'
+
 class Licit::Licenser
 
   def initialize(options = {})

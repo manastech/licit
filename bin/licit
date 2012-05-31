@@ -1,3 +1,4 @@
 #!/usr/bin/env ruby
 
 require 'licit'
+Licit::Command.new.run
