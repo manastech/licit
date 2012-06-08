@@ -49,13 +49,21 @@ class Licit::Licenser
   def fix_headers
     each_source_file do |source_file|
       if not check_file_header(source_file)
-        source = File.read source_file
+        source_lines = File.readlines source_file
+
+
+
         File.open source_file, 'w' do |f|
+          while should_skip? source_lines.first
+            f.write source_lines.shift
+          end
           header.each_line do |header_line|
             f.write "# #{header_line}"
           end
           f.write "\n"
-          f.write source
+          source_lines.each do |line|
+            f.write line
+          end
         end
       end
     end
@@ -71,10 +79,15 @@ class Licit::Licenser
   end
 
   def check_file_header(file)
+    at_beginning = true
     File.open(file, 'r') do |f|
       begin
         header.each_line do |header_line|
-          file_line = f.readline
+          begin
+            file_line = f.readline
+          end while at_beginning && should_skip?(file_line)
+          at_beginning = false
+
           return false unless file_line.start_with? '#'
           file_line = file_line[1..-1].strip
           return false if file_line != header_line.chomp
@@ -84,6 +97,13 @@ class Licit::Licenser
       end
     end
     true
+  end
+
+  def should_skip? line
+    line = line.strip
+    return true if line.empty?
+    return true if line.start_with? '#!'
+    return line =~ /^#\s*(encoding|coding)/
   end
 
   def files
