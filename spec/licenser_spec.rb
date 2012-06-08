@@ -17,7 +17,7 @@ describe Licit::Licenser do
     end
 
     it "composes header" do
-      licenser = Licit::Licenser.new copyright: 'Copyright Line', program_name: 'FooBar'
+      licenser = Licit::Licenser.new :copyright => 'Copyright Line', :program_name => 'FooBar'
       licenser.copyright.should == 'Copyright Line'
       licenser.program_name.should == 'FooBar'
       licenser.header.should == <<-END
@@ -45,7 +45,7 @@ END
     end
 
     context "dir1" do
-      let(:licenser) { Licit::Licenser.new dir: File.expand_path('../dir1', __FILE__) }
+      let(:licenser) { Licit::Licenser.new :dir => File.expand_path('../dir1', __FILE__) }
       after(:each) { FileUtils.rm_f Dir.glob(File.join(File.expand_path('../dir1', __FILE__), '*')) }
 
       it "checks missing files" do
@@ -59,7 +59,7 @@ END
     end
 
     context "dir2" do
-      let(:licenser) { Licit::Licenser.new dir: File.expand_path('../dir2.tmp', __FILE__), copyright: 'Copyright Line', program_name: 'FooBar' }
+      let(:licenser) { Licit::Licenser.new :dir => File.expand_path('../dir2.tmp', __FILE__), :copyright => 'Copyright Line', :program_name => 'FooBar' }
       before(:each) { FileUtils.cp_r File.expand_path('../dir2', __FILE__), File.expand_path('../dir2.tmp', __FILE__)}
       after(:each) { FileUtils.rm_rf File.expand_path('../dir2.tmp', __FILE__) }
 
@@ -68,7 +68,7 @@ END
       end
 
       it "check headers excluding directory" do
-        licenser = Licit::Licenser.new dir: File.expand_path('../dir2.tmp', __FILE__), copyright: 'Copyright Line', program_name: 'FooBar', exclude: ['subdir/']
+        licenser = Licit::Licenser.new :dir => File.expand_path('../dir2.tmp', __FILE__), :copyright => 'Copyright Line', :program_name => 'FooBar', :exclude => ['subdir/']
         licenser.check_headers.should =~ [[:error, 'test.rb', 'Missing header in test.rb']]
       end
 

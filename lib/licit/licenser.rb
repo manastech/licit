@@ -3,7 +3,7 @@ require 'erb'
 class Licit::Licenser
 
   def initialize(options = {})
-    defaults = { dir: '.', license: 'GPLv3', exclude: [] }
+    defaults = { :dir => '.', :license => 'GPLv3', :exclude => [] }
     @options = defaults.merge options
   end
 

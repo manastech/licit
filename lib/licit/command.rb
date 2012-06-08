@@ -30,7 +30,12 @@ class Licit::Command
       puts "Could not find licit.yml config file"
       exit 1
     end
-    YAML.load_file(config_file).each_with_object({}) { |(k,v), h| h[k.to_sym] = v }
+
+    config = {}
+    YAML.load_file(config_file).each do |key, value|
+      config[key.to_sym] = value
+    end
+    config
   end
 
   def find_file probes
