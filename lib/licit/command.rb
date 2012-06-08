@@ -11,9 +11,12 @@ class Licit::Command
   end
 
   def check(licenser)
+    has_errors = false
     (licenser.check_files | licenser.check_headers).each do |severity, file, message|
       puts message
+      has_errors = true if severity == :error
     end
+    exit (has_errors ? 1 : 0)
   end
 
   def fix(licenser)
