@@ -58,7 +58,7 @@ class Licit::Licenser
             f.write source_lines.shift
           end
           header.each_line do |header_line|
-            f.write "# #{header_line}"
+            f.puts "# #{header_line}".strip
           end
           f.write "\n"
           source_lines.each do |line|
