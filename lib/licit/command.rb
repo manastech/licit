@@ -1,3 +1,4 @@
+require 'yaml'
 
 class Licit::Command
 
